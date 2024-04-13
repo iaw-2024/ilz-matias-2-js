@@ -1,10 +1,34 @@
 const express = require("express");
+const path = require("path");
 const app = express();
+const cors = require("cors");
+const listaAlimentos = [
+    { id: 1, nombre: 'Pizza' },
+    { id: 2, nombre: 'Hamburguesa' },
+    { id: 3, nombre: 'Asado' }
+];
 
-app.get("/express", (req, res) => res.send("Express on Vercel!"));
-app.get("/cliente_servidor", (req, res) => res.send("Cliente Servidor on Vercel!"));
-app.use(express.static('public'))
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "../views")); 
 
-app.listen(3001, () => console.log("Server ready on port 3001."));
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+  
 
-module.exports = app;
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get("/express", (req, res) => {
+    res.render("index", { listaAlimentos: listaAlimentos });
+});
+app.get("/cliente-servidor", (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.json(listaAlimentos);
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server ready on port ${PORT}.`);
+});
